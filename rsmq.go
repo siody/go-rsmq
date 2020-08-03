@@ -273,6 +273,7 @@ func (r *RedisSMQ) GetQueueAttributes(queueName string) (*QueueAttributes, error
 	}, nil
 }
 
+// SetQueueAttributes change queue`s attributes in one call
 func (r *RedisSMQ) SetQueueAttributes(queueName string, visibilityTimeout uint64, delay uint64, maxSize int64) (*QueueAttributes, error) {
 	if err := validateQueueName(queueName); err != nil {
 		return nil, err
@@ -541,18 +542,20 @@ func makeID(n int) (string, error) {
 	return string(bytes), nil
 }
 
+var queueNameReg = regexp.MustCompile(`^([a-zA-Z0-9_-]){1,160}$`)
+
 func validateQueueName(str string) error {
-	re := regexp.MustCompile(`^([a-zA-Z0-9_-]){1,160}$`)
-	if !re.MatchString(str) {
+	if !queueNameReg.MatchString(str) {
 		return ErrInvalidQueueName
 	}
 
 	return nil
 }
 
+var messageIDReg = regexp.MustCompile(`^([a-zA-Z0-9:]){32}$`)
+
 func validateMessageID(str string) error {
-	re := regexp.MustCompile(`^([a-zA-Z0-9:]){32}$`)
-	if !re.MatchString(str) {
+	if !messageIDReg.MatchString(str) {
 		return ErrInvalidMessageID
 	}
 
